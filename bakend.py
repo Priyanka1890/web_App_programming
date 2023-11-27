@@ -1,11 +1,14 @@
 from flask import Flask, render_template, request
-from dbAccess import insert_new_registration_data #check_login_data
+from dbAccess import DB_Access
+
 
 Medical_app = Flask(__name__ )
+db = DB_Access()
+
 
 @Medical_app.route('/')
-def home():
-    return 'Medical App'
+def index():
+    return render_template('index.html')
 
 @Medical_app.route('/register') 
 def register():
@@ -15,10 +18,6 @@ def register():
 @Medical_app.route('/about')
 def about():
     return render_template('about.html')
-
-
-
-
 
 
 @Medical_app.route('/registerchk', methods=["POST"])
@@ -31,9 +30,11 @@ def registerchk():
         phone = request.form.get("phone")
         email = request.form.get("email")
 
-        result = insert_new_registration_data(table_name="userDetail.csv", names=name, passwords=password, phones=phone, emails=email, addresss=address)
+        result = db.insert_new_registration_data(
+            names=name, passwords=password, phones=phone, emails=email, addresss=address
+        )
 
-        if result == 1:
+        if result:
             return render_template('login.html')
         else:
             return render_template('error.html')
@@ -50,13 +51,13 @@ def loginchk():
         username = request.form.get("usr")
         password = request.form.get("pwd")
 
-        result = check_login_data(table_name="userDetail.csv", emails=username, passwords=password)
-
-        if result == 1:
+        result = db.check_login_data(emails=username, passwords=password)
+        if result:
             return render_template('home.html')
         else:
             return render_template('error.html')
 
 
 if __name__ == '__main__':
+
     Medical_app.run()

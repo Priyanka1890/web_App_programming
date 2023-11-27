@@ -1,31 +1,36 @@
 import pandas as pd
+import mysql.connector
+from mysql.connector import MySQLConnection, Error
 
 
-def insert_new_registration_data(table_name: str, names: str, passwords: str, phones: str, emails: str,
-                                 addresss: str) -> int:
-    old_df = pd.read_csv(table_name, index_col=False)  # existing table data
-    idx = len(old_df)
-    new_data_point = pd.DataFrame([{
-        "idx": idx,
-        "name": names,
-        "password": passwords,
-        "address": addresss,
-        "phone": phones,
-        "email": emails,
-    }])
-    new_df = pd.concat([old_df, new_data_point], axis=0)
-    new_df.to_csv(table_name, index=False)
-    if len(old_df) < len(new_df):
-        return 1
-    else:
-        return 0
+class DB_Access:
+    def __init__(self) -> None:
+        self.mydb = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password="password",
+            database="appdb"
+        )
+        self.mycursor = self.mydb.cursor()
 
-
-def check_login_data(table_name, emails, passwords) -> int:
-    df = pd.read_csv(table_name)  # existing table data
-    selected_df = df[(df.email == emails) & (df.password.values.astype('str') == passwords)]
-    print(selected_df)
-    if len(selected_df) > 0:
-        return 1
+    def insert_new_registration_data(self,  names, passwords, phones, emails, addresss) -> bool:
+        self.mycursor.execute(
+            "INSERT INTO registration (name, password, phone, email, address) VALUES (%s, %s, %s, %s, %s)",
+            (names, passwords, phones, emails, addresss))
+        self.mydb.commit()
+        if self.mycursor.rowcount > 0:
+            return True
         else:
-        return 0
+            return False
+
+
+    def check_login_data(self, emails, passwords) -> bool:
+        self.mycursor.execute(
+            "SELECT * FROM registration WHERE email = %s AND password = %s",
+            (emails, passwords))
+        result = self.mycursor.fetchall()
+        if len(result) > 0:
+            return True
+        else:
+            return False
+
