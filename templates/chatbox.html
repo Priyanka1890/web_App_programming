@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat Box - All Students</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Chat Box - All Students</h1>
+    <div id="chat-container">
+        <div id="messages"></div>
+        <form id="message-form">
+            <input type="text" id="user-input" autocomplete="off" placeholder="Type your message...">
+            <button type="submit">Send</button>
+        </form>
+    </div>
+    <script>
+        $(document).ready(function() {
+            // Connect to the chat server
+            var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+            // Receive messages from the server
+            socket.on('message', function(data) {
+                $('#messages').append('<p><strong>' + data.username + ':</strong> ' + data.message + '</p>');
+            });
+
+            // Send messages to the server
+            $('#message-form').submit(function(e) {
+                e.preventDefault();
+                var userInput = $('#user-input').val();
+                socket.emit('message', { message: userInput });
+                $('#messages').append('<p><strong>You:</strong> ' + userInput + '</p>');
+                $('#user-input').val('');
+            });
+        });
+    </script>
+</body>
+</html>

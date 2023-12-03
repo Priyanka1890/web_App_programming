@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Medical System</title>
+  <title>Login Page</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -19,22 +19,16 @@
       text-align: center;
     }
 
-    .container ul {
-      list-style-type: none;
-      margin: 0;
-      padding: 0;
-    }
-
-    .container li {
+    .container input[type="text"],
+    .container input[type="password"] {
+      width: 100%;
+      padding: 10px;
       margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
     }
 
-    .container a {
-      text-decoration: none;
-      color: #4CAF50;
-    }
-
-    .container button {
+    .container input[type="submit"] {
       width: 100%;
       padding: 10px;
       background-color: #4CAF50;
@@ -47,15 +41,14 @@
 </head>
 <body>
   <div class="container">
-    <h2>Home Page</h2>
-    <ul>
+    <h2>Login</h2>
 
-      <li><a href="https://ec.th-deg.de/">Visit ECRI campus</a></li>
-      <li><a href="/appointment">Doctor's appointment</a></li>
-      <li><a href="/chatbox">chatbox</a></li>
 
-    </ul>
-
+    <form action="loginchk" method="post">
+      <input type="text" placeholder="Username" required>
+      <input type="password" placeholder="Password" required>
+      <input type="submit" value="Login">
+    </form>
   </div>
 </body>
 </html>
