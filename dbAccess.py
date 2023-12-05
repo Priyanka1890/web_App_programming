@@ -1,5 +1,8 @@
 
 import sqlite3
+import pandas as pd
+import datetime
+
 
 class DB_Access:
     def __init__(self, db_file_location:str) -> None:
@@ -24,3 +27,17 @@ class DB_Access:
             return True
         else:
             return False
+
+    def insert_new_message_data(self, senders, receivers, messages, datetime) -> bool:
+        sqlite_insert_query = f"INSERT INTO chatbox (sender, receiver, message,date_time) VALUES (?, ?, ?, ?)"
+        self.mycursor.execute(sqlite_insert_query, (senders, receivers, messages, datetime.datetime.now()))
+        self.connection.commit()
+        if self.mycursor.rowcount > 0:
+            return True
+        else:
+            return False
+    def get_all_user_email(self) -> list:
+        self.mycursor.execute("SELECT email FROM registration")
+        result = self.mycursor.fetchall()
+        return result
+

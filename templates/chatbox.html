@@ -1,37 +1,89 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>Chat Box - All Students</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbox</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        #container {
+            display: flex;
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #user-list {
+            flex: 1;
+            padding: 20px;
+            border-right: 1px solid #ddd;
+            overflow-y: auto;
+        }
+
+        #user-list ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        #user-list li {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+
+        #user-list li:hover {
+            background-color: #f9f9f9;
+        }
+
+        #chat-box {
+            flex: 2;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        #message-input {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+        }
+
+        #send-button {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
 </head>
+
 <body>
-    <h1>Chat Box - All Students</h1>
-    <div id="chat-container">
-        <div id="messages"></div>
-        <form id="message-form">
-            <input type="text" id="user-input" autocomplete="off" placeholder="Type your message...">
-            <button type="submit">Send</button>
-        </form>
+<div id="container">
+    <div id="user-list">
+        <h2>User List</h2>
+        <ul>
+            {% for item in data['all_mails'] %}
+            <li>{{item}}</li>
+            {% endfor %}
+            <!-- Add more users as needed -->
+        </ul>
     </div>
-    <script>
-        $(document).ready(function() {
-            // Connect to the chat server
-            var socket = io.connect('http://' + document.domain + ':' + location.port);
+</div>
 
-            // Receive messages from the server
-            socket.on('message', function(data) {
-                $('#messages').append('<p><strong>' + data.username + ':</strong> ' + data.message + '</p>');
-            });
 
-            // Send messages to the server
-            $('#message-form').submit(function(e) {
-                e.preventDefault();
-                var userInput = $('#user-input').val();
-                socket.emit('message', { message: userInput });
-                $('#messages').append('<p><strong>You:</strong> ' + userInput + '</p>');
-                $('#user-input').val('');
-            });
-        });
-    </script>
+
+</form>
 </body>
 </html>

@@ -1,22 +1,15 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, session
 from dbAccess import DB_Access
-from flask_socketio import SocketIO, emit
+
+
+db_file_location = "./app_db"
 
 Medical_app = Flask(__name__ )
+Medical_app.secret_key = 'super secret key'
+
+
+
 db = DB_Access(db_file_location="./app_db")
-socketio = SocketIO(Medical_app, cors_allowed_origins="*")
-
-
-@socketio.on('connect')
-def handle_message(data):
-    emit('message', {'username': 'Student', 'message': data['message']}, broadcast=True)
-
-
-@socketio.on('disconnect')
-def disconnect():
-    print('Client disconnected')
-
-
 
 @Medical_app.route('/')
 def index():
@@ -59,6 +52,9 @@ def loginchk():
         password = request.form.get("pwd")
 
         result = db.check_login_data(emails=username, passwords=password)
+
+        session['user_mail'] = username
+
         if result:
             return render_template('home.html')
         else:
@@ -73,9 +69,34 @@ def appointment():
 
 @Medical_app.route('/chatbox')
 def chatbox():
-    return render_template('chatbox.html')
+    ls = db.get_all_user_email()
+    ls = [x[0] for x in ls]
+    ls.remove(session['user_mail'])
+    session['all_mails'] = ls
+
+
+    session['all_msg'] = []
+
+    return render_template('chatbox.html', data={"all_mails":  session['all_mails'], "all_msg": session['all_msg']})
+
+
+@Medical_app.route('/chatboxchk', methods=["POST"])
+def chatboxchk():
+    if request.method == "POST":
+
+        sender = request.form.get("senders_message")
+        receiver = request.form.get("Receivers_message")
+        message= request.form.get("message")
+        date_time = request.form.get("date_time")
+        result = db.insert_new_message_data(
+            senders=sender, receivers=receiver, messages=message, date_time=date_time
+        )
+
+        if result:
+            return render_template('home.html')
+        else:
+            return render_template('error.html')
 
 if __name__ == '__main__':
 
     Medical_app.run()
-    socketio.run(Medical_app, debug=True)
