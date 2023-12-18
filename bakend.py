@@ -2,14 +2,14 @@ from flask import Flask, render_template, request, session
 from dbAccess import DB_Access
 
 
-db_file_location = "./app_db"
+db_file_location = "app_db.db"
 
 Medical_app = Flask(__name__ )
 Medical_app.secret_key = 'super secret key'
 
 
 
-db = DB_Access(db_file_location="./app_db")
+db = DB_Access(db_file_location="app_db.db")
 
 @Medical_app.route('/')
 def index():
@@ -73,29 +73,37 @@ def chatbox():
     ls = [x[0] for x in ls]
     ls.remove(session['user_mail'])
     session['all_mails'] = ls
-
-
-    session['all_msg'] = []
+    temp = db.get_all_message(receiver=session['user_mail'])
+    temp = [
+        f" Sender:{x[0]} Time:{x[3]} Message:{x[2]}" for x in temp
+    ]
+    session['all_msg'] = temp
 
     return render_template('chatbox.html', data={"all_mails":  session['all_mails'], "all_msg": session['all_msg']})
 
 
-@Medical_app.route('/chatboxchk', methods=["POST"])
-def chatboxchk():
+@Medical_app.route('/msgsend', methods=["POST"])
+def msgsend():
     if request.method == "POST":
 
-        sender = request.form.get("senders_message")
-        receiver = request.form.get("Receivers_message")
-        message= request.form.get("message")
-        date_time = request.form.get("date_time")
-        result = db.insert_new_message_data(
-            senders=sender, receivers=receiver, messages=message, date_time=date_time
-        )
+        sender = session['user_mail']
+        receiver = request.form.get("recipient")
+        message= request.form.get("msg")
 
+        result = db.insert_new_message_data(
+            senders=sender, receivers=receiver, messages=message,
+        )
         if result:
-            return render_template('home.html')
+            return render_template('chatbox.html', data={"all_mails":  session['all_mails'], "all_msg": session['all_msg']})
         else:
             return render_template('error.html')
+@Medical_app.route('/logout', methods=["POST", "GET"])
+def logout():
+    session['all_mails'] = []
+    session['user_mail'] = []
+    session['all_msg'] = []
+    return render_template('index.html')
+
 
 if __name__ == '__main__':
 

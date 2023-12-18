@@ -28,8 +28,8 @@ class DB_Access:
         else:
             return False
 
-    def insert_new_message_data(self, senders, receivers, messages, datetime) -> bool:
-        sqlite_insert_query = f"INSERT INTO chatbox (sender, receiver, message,date_time) VALUES (?, ?, ?, ?)"
+    def insert_new_message_data(self, senders, receivers, messages) -> bool:
+        sqlite_insert_query = f"INSERT INTO chatbox (sender, receiver, message, date_time) VALUES (?, ?, ?, ?)"
         self.mycursor.execute(sqlite_insert_query, (senders, receivers, messages, datetime.datetime.now()))
         self.connection.commit()
         if self.mycursor.rowcount > 0:
@@ -38,6 +38,11 @@ class DB_Access:
             return False
     def get_all_user_email(self) -> list:
         self.mycursor.execute("SELECT email FROM registration")
+        result = self.mycursor.fetchall()
+        return result
+
+    def get_all_message(self, receiver:str):
+        self.mycursor.execute(f"SELECT * FROM chatbox where receiver='{receiver}'")
         result = self.mycursor.fetchall()
         return result
 

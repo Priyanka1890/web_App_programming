@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <title>Chatbox</title>
     <style>
         body {
@@ -70,20 +72,53 @@
 </head>
 
 <body>
+<a href="/logout">Loogout</a>
 <div id="container">
-    <div id="user-list">
-        <h2>User List</h2>
-        <ul>
+    <h2>User List</h2>
+    <div>
+        <ul id="ls">
             {% for item in data['all_mails'] %}
-            <li>{{item}}</li>
+            <li>
+                <span onclick="click_elm(this);">{{item}}</span>
+            </li>
             {% endfor %}
+            <script>
+                function click_elm(elmnt){
+                    document.getElementById("recipient").value= $(elmnt).text();
+                }
+            </script>
             <!-- Add more users as needed -->
         </ul>
     </div>
+    <div>
+        <form action="msgsend" method="post">
+            <table>
+                <tr>
+                    <ul id="lss">
+                    {% for item in data['all_msg'] %}
+                    <li>
+                        <span>{{item}}</span>
+                    </li>
+                    {% endfor %}
+                    <!-- Add more users as needed -->
+                    </ul>
+                </tr>
+                <tr>
+                    <td>TO</td>
+                    <td><input type="text" id="recipient" name="recipient" value="Recipient Address"/><td>
+                </tr>
+                 <tr>
+                    <td>
+                        <textarea id="message-input" name="msg"></textarea>
+                         <br>
+                    </td>
+                </tr>
+                 <tr>
+                    <td><input id="send-button" type="submit" value="Submit"></td>
+                </tr>
+            </table>
+        </form>
+    </div>
 </div>
-
-
-
-</form>
 </body>
 </html>
